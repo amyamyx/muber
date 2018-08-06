@@ -5,10 +5,17 @@ const routes = require('./routes/routes');
 const app = express();
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/muber', { useNewUrlParser: true });
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect('mongodb://localhost:27017/muber', { useNewUrlParser: true });
+} 
 
-// place app.user right before routes(app)
+// place app.use before routes(app)
 app.use(bodyParser.json());
 routes(app);
+
+app.use((err, req, res, next) => {
+  res.status(422).send({ error: err.message } )
+});
+
 
 module.exports = app;
